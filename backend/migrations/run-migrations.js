@@ -8,6 +8,9 @@ const pool = new Pool({
   database: process.env.POSTGRES_DB,
   password: process.env.POSTGRES_PASSWORD,
   port: parseInt(process.env.POSTGRES_PORT || '5432'),
+  ssl: {
+    rejectUnauthorized: false // Required for Railway's PostgreSQL
+  }
 });
 
 async function runMigrations() {
