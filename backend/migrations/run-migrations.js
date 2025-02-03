@@ -2,6 +2,8 @@ const { Pool } = require('pg');
 const fs = require('fs');
 const path = require('path');
 
+console.log('Available environment variables:', Object.keys(process.env));
+console.log('Database URL starts with:', process.env.DATABASE_URL ? process.env.DATABASE_URL.split('@')[0] : 'not set');
 
 if (!process.env.DATABASE_URL) {
   console.error('DATABASE_URL environment variable is not set');
