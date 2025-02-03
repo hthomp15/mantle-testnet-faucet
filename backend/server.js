@@ -25,7 +25,7 @@ const eventLogger = new EventLogger(RPC_URL, FAUCET_ADDRESS);
 
 // Middleware
 app.use(cors({
-    origin: 'http://localhost:3000'
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000'
 }));
 app.use(express.json());
 
