@@ -2,6 +2,12 @@ const { Pool } = require('pg');
 const fs = require('fs');
 const path = require('path');
 
+
+if (!process.env.DATABASE_URL) {
+  console.error('DATABASE_URL environment variable is not set');
+  process.exit(1);
+}
+
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
