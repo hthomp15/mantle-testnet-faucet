@@ -4,7 +4,6 @@ require('dotenv').config();
 const userRoutes = require('./routes/users');
 const { EventLogger } = require('./services/eventLogger');
 const { logger } = require('./utils/logger');
-const { Pool } = require('pg');
 
 // Add immediate test logs
 logger.info('Server initialization beginning');
@@ -23,26 +22,6 @@ if (!RPC_URL || !FAUCET_ADDRESS) {
 logger.info('Config loaded:', { RPC_URL, FAUCET_ADDRESS });
 
 const eventLogger = new EventLogger(RPC_URL, FAUCET_ADDRESS);
-
-const pool = new Pool({
-  user: process.env.POSTGRES_USER,
-  host: process.env.POSTGRES_HOST,
-  database: process.env.POSTGRES_DB,
-  password: process.env.POSTGRES_PASSWORD,
-  port: parseInt(process.env.POSTGRES_PORT || '5432'),
-  ssl: {
-    rejectUnauthorized: false // Required for Railway's PostgreSQL
-  }
-});
-
-// Add this before server.listen
-logger.info('Database connection config:', {
-  user: process.env.POSTGRES_USER,
-  host: process.env.POSTGRES_HOST,
-  database: process.env.POSTGRES_DB,
-  port: process.env.POSTGRES_PORT
-  // Don't log password!
-});
 
 // Middleware
 app.use(cors({
