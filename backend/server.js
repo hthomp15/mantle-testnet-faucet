@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
+const { Pool } = require('pg');
 const userRoutes = require('./routes/users');
 const { EventLogger } = require('./services/eventLogger');
 const { logger } = require('./utils/logger');
@@ -9,6 +10,23 @@ const { logger } = require('./utils/logger');
 logger.info('Server initialization beginning');
 
 const app = express();
+
+// Initialize database connection
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
+});
+
+// Test database connection
+pool.query('SELECT NOW()', (err, res) => {
+  if (err) {
+    logger.error('Database connection error:', err);
+  } else {
+    logger.info('Database connected successfully');
+  }
+});
 
 // Initialize event logger
 const RPC_URL = process.env.RPC_URL;
