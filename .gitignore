@@ -1,0 +1,46 @@
+# Environment variables
+.env
+.env.local
+.env.*
+
+# Dependencies
+node_modules
+package-lock.json
+yarn.lock
+
+# Hardhat files
+cache
+artifacts
+typechain
+typechain-types
+
+# Coverage directory
+coverage
+coverage.json
+
+# Deployment files
+deployments
+
+# Debug logs
+*.log
+
+# IDE files
+.idea
+.vscode
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Backend dependencies
+/backend/node_modules
+
+# Frontend
+/frontend/node_modules
+/frontend/build
+
+# Environment files
+.env.development
+.env.production 
