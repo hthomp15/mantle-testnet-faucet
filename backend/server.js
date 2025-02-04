@@ -106,6 +106,12 @@ const startServer = async () => {
     logger.info('Test endpoint hit');
     res.send('Logged test message');
   });
+
+  // Add near the top after your requires
+  logger.info('Database URL format check:', {
+    hasUrl: !!process.env.DATABASE_URL,
+    startsWith: process.env.DATABASE_URL ? process.env.DATABASE_URL.split('@')[0].split(':')[0] : 'not set'
+  });
 };
 
 startServer().catch(error => {

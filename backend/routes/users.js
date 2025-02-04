@@ -1,6 +1,25 @@
 const express = require('express');
 const router = express.Router();
+const { Pool } = require('pg');
+const { logger } = require('../utils/logger');
 const db = require('../db');
+
+// Create a single pool instance
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  },
+  // Add connection retry options
+  connectionTimeoutMillis: 5000,
+  retryDelay: 1000,
+  max: 20
+});
+
+// Test the connection
+pool.on('error', (err) => {
+  logger.error('Unexpected error on idle client', err);
+});
 
 // Create a new user
 router.post('/users', async (req, res) => {
@@ -12,8 +31,8 @@ router.post('/users', async (req, res) => {
     );
     res.json(result.rows[0]);
   } catch (error) {
-    console.error('Error creating user:', error);
-    res.status(500).json({ error: error.message });
+    logger.error('Error creating user:', error);
+    res.status(500).json({ error: 'Failed to create user' });
   }
 });
 
@@ -72,7 +91,7 @@ router.post('/claims', async (req, res) => {
       remainingAmount: MAX_AMOUNT - (totalClaimed + requestAmount)
     });
   } catch (error) {
-    console.error('Error creating claim:', error);
+    logger.error('Error creating claim:', error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -120,10 +139,9 @@ router.get('/claims/:walletAddress', async (req, res) => {
       lastClaim: claimStats.last_claim
     });
   } catch (error) {
-    console.error('Error fetching claims:', error);
+    logger.error('Error fetching claims:', error);
     res.status(500).json({ error: error.message });
   }
 });
-
 
 module.exports = router; 
