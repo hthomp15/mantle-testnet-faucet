@@ -1,5 +1,4 @@
 const { ethers } = require('ethers');
-const { logger } = require('../utils/logger');
 
 const FAUCET_ABI = [
   "event TokensRequested(address indexed recipient, uint256 amount)",
@@ -12,7 +11,7 @@ const FAUCET_ABI = [
 
 class EventLogger {
   constructor(rpcUrl, faucetAddress) {
-    logger.info('Initializing EventLogger', {
+    console.log('Initializing EventLogger', {
       rpcUrl,
       faucetAddress
     });
@@ -26,7 +25,7 @@ class EventLogger {
   async startListening() {
     if (this.isListening) return;
     
-    logger.info('Setting up event polling...');
+    console.log('Setting up event polling...');
 
     try {
       // Get current block number
@@ -42,13 +41,13 @@ class EventLogger {
             
             for (const event of events) {
               if (event.fragment.name === 'TokensRequested') {
-                logger.info('Tokens Requested', {
+                console.log('Tokens Requested', {
                   recipient: event.args[0],
                   amount: event.args[1].toString(),
                   transactionHash: event.transactionHash
                 });
               } else if (event.fragment.name === 'TokensClaimed') {
-                logger.info('Tokens Claimed', {
+                console.log('Tokens Claimed', {
                   user: event.args[0],
                   amount: event.args[1].toString(),
                   timestamp: new Date(Number(event.args[2]) * 1000).toISOString(),
@@ -56,24 +55,24 @@ class EventLogger {
                   transactionHash: event.transactionHash
                 });
               } else if (event.fragment.name === 'LowBalance') {
-                logger.warn('Low Balance Alert', {
+                console.warn('Low Balance Alert', {
                   currentBalance: event.args[0].toString(),
                   threshold: event.args[1].toString(),
                   timestamp: new Date(Number(event.args[2]) * 1000).toISOString(),
                   transactionHash: event.transactionHash
                 });
               } else if (event.fragment.name === 'FaucetPaused') {
-                logger.warn('Faucet Paused', {
+                console.warn('Faucet Paused', {
                   by: event.args[0],
                   transactionHash: event.transactionHash
                 });
               } else if (event.fragment.name === 'FaucetUnpaused') {
-                logger.info('Faucet Unpaused', {
+                console.log('Faucet Unpaused', {
                   by: event.args[0],
                   transactionHash: event.transactionHash
                 });
               } else if (event.fragment.name === 'TokensReceived') {
-                logger.info('Tokens Received', {
+                console.log('Tokens Received', {
                   from: event.args[0],
                   amount: event.args[1].toString(),
                   transactionHash: event.transactionHash
@@ -84,14 +83,14 @@ class EventLogger {
             this.lastBlockNumber = currentBlock;
           }
         } catch (error) {
-          logger.error('Error polling events:', error);
+          console.error('Error polling events:', error);
         }
       }, 5000); // Poll every 5 seconds
 
       this.isListening = true;
-      logger.info('Event polling started');
+      console.log('Event polling started');
     } catch (error) {
-      logger.error('Failed to start event polling:', error);
+      console.error('Failed to start event polling:', error);
       throw error;
     }
   }
@@ -99,7 +98,7 @@ class EventLogger {
   async stopListening() {
     if (!this.isListening) return;
 
-    logger.info('Stopping event polling...');
+    console.log('Stopping event polling...');
     
     try {
       if (this.pollInterval) {
@@ -107,9 +106,9 @@ class EventLogger {
       }
       
       this.isListening = false;
-      logger.info('Event polling stopped');
+      console.log('Event polling stopped');
     } catch (error) {
-      logger.error('Error stopping event polling:', error);
+      console.error('Error stopping event polling:', error);
       throw error;
     }
   }

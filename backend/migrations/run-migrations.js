@@ -1,6 +1,6 @@
-const { Pool } = require('pg');
 const fs = require('fs');
 const path = require('path');
+const db = require('../db');
 
 console.log('Available environment variables:', Object.keys(process.env));
 console.log('Database URL starts with:', process.env.DATABASE_URL ? process.env.DATABASE_URL.split('@')[0] : 'not set');
@@ -9,13 +9,6 @@ if (!process.env.DATABASE_URL) {
   console.error('DATABASE_URL environment variable is not set');
   process.exit(1);
 }
-
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
 
 async function runMigrations() {
   try {
@@ -29,7 +22,7 @@ async function runMigrations() {
         const sql = fs.readFileSync(filePath, 'utf-8');
         
         console.log(`Running migration: ${file}`);
-        await pool.query(sql);
+        await db.query(sql);
         console.log(`Completed migration: ${file}`);
       }
     }
@@ -39,7 +32,7 @@ async function runMigrations() {
     console.error('Migration failed:', error);
     throw error;
   } finally {
-    await pool.end();
+    await db.pool.end();
   }
 }
 

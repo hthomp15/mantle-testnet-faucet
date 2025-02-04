@@ -1,120 +1,28 @@
 const express = require('express');
 const cors = require('cors');
+const usersRouter = require('./routes/users');
 require('dotenv').config();
-const { Pool } = require('pg');
-const userRoutes = require('./routes/users');
-const { EventLogger } = require('./services/eventLogger');
-const { logger } = require('./utils/logger');
 
-// Initialize database connection
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  },
-  // Add connection retry options
-  connectionTimeoutMillis: 5000,
-  retryDelay: 1000,
-  max: 20
+const app = express();
+const port = process.env.PORT || 5001;
+
+// Middleware
+app.use(express.json());
+app.use(cors({
+  origin: [
+    'https://mantle-testnet-faucet.vercel.app',
+    'http://localhost:3000'
+  ]
+}));
+
+// Routes
+app.use('/api', usersRouter);
+
+// Basic health check
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok' });
 });
 
-// Test database connection with better error handling
-const testDatabaseConnection = async () => {
-  try {
-    const result = await pool.query('SELECT NOW()');
-    logger.info('Database connected successfully');
-    return true;
-  } catch (err) {
-    logger.error('Database connection error:', {
-      message: err.message,
-      code: err.code
-    });
-    return false;
-  }
-};
-
-// Use async/await for server startup
-const startServer = async () => {
-  logger.info('Server initialization beginning');
-  
-  // Test database connection first
-  const dbConnected = await testDatabaseConnection();
-  if (!dbConnected) {
-    logger.error('Failed to connect to database, exiting');
-    process.exit(1);
-  }
-
-  // Initialize event logger
-  const RPC_URL = process.env.RPC_URL;
-  const FAUCET_ADDRESS = process.env.FAUCET_ADDRESS;
-
-  if (!RPC_URL || !FAUCET_ADDRESS) {
-    logger.error('Missing required environment variables');
-    process.exit(1);
-  }
-
-  logger.info('Config loaded:', { RPC_URL, FAUCET_ADDRESS });
-
-  const eventLogger = new EventLogger(RPC_URL, FAUCET_ADDRESS);
-
-  const app = express();
-
-  // Middleware
-  app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
-    methods: ['GET', 'POST'],
-    credentials: true
-  }));
-  app.use(express.json());
-
-  // Use routes
-  app.use('/api', userRoutes);
-
-  const PORT = process.env.PORT || 5001;
-
-  const server = app.listen(PORT, async () => {
-    logger.info(`Express server starting on port ${PORT}`);
-    try {
-      await eventLogger.startListening();
-      logger.info(`Server running on port ${PORT} with event logging enabled`);
-    } catch (error) {
-      logger.error('Failed to start event logger:', error);
-    }
-  });
-
-  // Graceful shutdown
-  const shutdown = async () => {
-    logger.info('Shutdown initiated');
-    try {
-      await eventLogger.stopListening();
-      server.close(() => {
-        logger.info('Server shutting down...');
-        process.exit(0);
-      });
-    } catch (error) {
-      logger.error('Error during shutdown:', error);
-      process.exit(1);
-    }
-  };
-
-  // Handle shutdown signals
-  process.on('SIGTERM', shutdown);
-  process.on('SIGINT', shutdown);
-
-  // Add test endpoint
-  app.get('/test-log', (req, res) => {
-    logger.info('Test endpoint hit');
-    res.send('Logged test message');
-  });
-
-  // Add near the top after your requires
-  logger.info('Database URL format check:', {
-    hasUrl: !!process.env.DATABASE_URL,
-    startsWith: process.env.DATABASE_URL ? process.env.DATABASE_URL.split('@')[0].split(':')[0] : 'not set'
-  });
-};
-
-startServer().catch(error => {
-  logger.error('Failed to start server:', error);
-  process.exit(1);
+app.listen(port, () => {
+  console.log(`Server running on port ${port}`);
 }); 
