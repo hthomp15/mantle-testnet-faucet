@@ -14,7 +14,7 @@ contract TestToken is ERC20, AccessControl {
         uint256 timestamp
     );
 
-    constructor() ERC20("Test TIDE", "TFIDE") {
+    constructor() ERC20("Test TFIDE", "TFIDE") {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(MINTER_ROLE, msg.sender);
         

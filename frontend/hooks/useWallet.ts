@@ -95,7 +95,8 @@ export function useWallet() {
         if (isCorrectChain) {
           const signer = await newProvider.getSigner();
           const address = await signer.getAddress();
-          setAccount(address);
+          const normalizedAddress = address.toLowerCase();
+          setAccount(normalizedAddress);
           setError('');
         }
       }
@@ -151,16 +152,17 @@ export function useWallet() {
       const currentProvider = provider || new ethers.BrowserProvider(window.ethereum);
       const signer = await currentProvider.getSigner();
       const address = await signer.getAddress();
+      const normalizedAddress = address.toLowerCase();
       console.log('Connected wallet address:', address);
       // Register user in our backend
-      await api.registerUser(address);
+      await api.registerUser(normalizedAddress);
       
-      setAccount(address);
+      setAccount(normalizedAddress);
       localStorage.setItem("connectedWallet", "true");
 
       await checkChain();
       
-      return address;
+      return normalizedAddress;
     } catch (error) {
       setError('Failed to connect wallet');
       return undefined;
