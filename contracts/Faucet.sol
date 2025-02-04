@@ -90,14 +90,15 @@ contract Faucet is ReentrancyGuard, AccessControl {
         UserClaims storage claims = userClaims[msg.sender];
         uint256 newWindowTotal;
         if (claims.lastClaimTime + cooldownTime < block.timestamp) {
-            // Reset if window has passed
+            // Reset if window has passed - this is a fresh claim
             newWindowTotal = amount;
             claims.totalClaimed = amount;
+            claims.lastClaimTime = block.timestamp;  // Set time only for fresh claims
         } else {
+            // Within existing window - don't update the time
             newWindowTotal = claims.totalClaimed + amount;
             claims.totalClaimed = newWindowTotal;
         }
-        claims.lastClaimTime = block.timestamp;
 
         // Transfer tokens
         require(token.transfer(msg.sender, amount), "Token transfer failed");

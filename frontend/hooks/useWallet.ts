@@ -50,8 +50,9 @@ export function useWallet() {
 
     try {
       const signer = await provider.getSigner();
-      const address = await signer.getAddress();
-      setAccount(address);
+      const address = await signer.getAddress()
+      const normalizedAddress = address.toLowerCase();
+      setAccount(normalizedAddress);
       await checkChain();
     } catch (error) {
       console.error("Error checking initial connection:", error);
@@ -68,12 +69,14 @@ export function useWallet() {
   }, [provider, checkConnection, mounted]);
 
   const handleAccountsChanged = useCallback((accounts: string[]) => {
+    console.log('Accounts changed:', accounts);
     if (accounts.length === 0) {
       setAccount("");
       setIsWrongChain(false);
       setError("");
     } else {
-      setAccount(accounts[0]);
+      const normalizedAccount = accounts[0].toLowerCase();
+      setAccount(normalizedAccount);
       checkChain();
     }
   }, [checkChain]);
@@ -128,30 +131,6 @@ export function useWallet() {
     };
   }, [handleChainChanged, handleAccountsChanged, mounted]);
 
-  const registerUser = async (walletAddress: string) => {
-    try {
-      await api.checkStatus(walletAddress);
-    } catch (error) {
-      // If user doesn't exist, create them
-      try {
-        await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/users`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ walletAddress })
-        });
-      } catch (error) {
-        console.error('Error registering user:', error);
-      }
-    }
-  };
-
-  const disconnectWallet = useCallback(() => {
-    setAccount('');
-    setError('');
-    setIsWrongChain(false);
-    localStorage.removeItem("connectedWallet");
-  }, []);
-
   const connectWallet = async () => {
     try {
       // Reinitialize provider if it's null
@@ -172,9 +151,9 @@ export function useWallet() {
       const currentProvider = provider || new ethers.BrowserProvider(window.ethereum);
       const signer = await currentProvider.getSigner();
       const address = await signer.getAddress();
-
+      console.log('Connected wallet address:', address);
       // Register user in our backend
-      await registerUser(address);
+      await api.registerUser(address);
       
       setAccount(address);
       localStorage.setItem("connectedWallet", "true");
@@ -189,6 +168,13 @@ export function useWallet() {
       setLoading(false);
     }
   };
+
+  const disconnectWallet = useCallback(() => {
+    setAccount('');
+    setError('');
+    setIsWrongChain(false);
+    localStorage.removeItem("connectedWallet");
+  }, []);
 
   return {
     account,

@@ -13,6 +13,9 @@ NEXT_PUBLIC_FAUCET_ADDRESS=0x... # Faucet contract address
 
 # API Configuration
 NEXT_PUBLIC_API_URL=http://localhost:5001 # Backend API URL
+
+# reCAPTCHA Configuration
+NEXT_PUBLIC_RECAPTCHA_SITE_KEY=your_site_key # Google reCAPTCHA v2 site key
 ```
 
 ## Getting Started
@@ -58,6 +61,7 @@ When deploying to production:
    - `NEXT_PUBLIC_TOKEN_ADDRESS`
    - `NEXT_PUBLIC_FAUCET_ADDRESS`
    - `NEXT_PUBLIC_API_URL`
+   - `NEXT_PUBLIC_RECAPTCHA_SITE_KEY`
 3. Deploy using your preferred hosting service (Vercel recommended)
 
 ## Network Configuration
@@ -72,3 +76,4 @@ The application is configured to work with Mantle Sepolia testnet. Users will ne
 
 - [Mantle Network Documentation](https://docs.mantle.xyz)
 - [Next.js Documentation](https://nextjs.org/docs)
+- [Google reCAPTCHA Documentation](https://developers.google.com/recaptcha/docs/v3)

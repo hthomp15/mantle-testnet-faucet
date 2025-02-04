@@ -35,6 +35,9 @@ npm install
 # Deploy to Mantle Sepolia
 npx hardhat run scripts/deploy.js --network mantleSepolia
 
+# Export ContractABI to frontend/contracts
+npx hardhat run scripts/exportAbis.js
+
 # Verify contracts (optional)
 npx hardhat verify --network mantleSepolia <CONTRACT_ADDRESS> <CONSTRUCTOR_ARGS>
 ```
@@ -46,7 +49,7 @@ npx hardhat verify --network mantleSepolia <CONTRACT_ADDRESS> <CONSTRUCTOR_ARGS>
 
 ## Backend Service
 
-The backend monitors contract events and provides API endpoints for the frontend. See [backend/README.md](backend/README.md) for setup instructions.
+See [backend/README.md](backend/README.md) for setup and configuration instructions.
 
 ## Frontend Application
 
@@ -91,8 +94,8 @@ npx hardhat coverage
 
 ### Root
 ```bash
-PRIVATE_KEY=your_private_key
-MANTLE_SEPOLIA_RPC=https://rpc.sepolia.mantle.xyz
+ACCOUNT_PRIVATE_KEY=your_private_key
+MANTLE_TESTNET_RPC_URL=https://rpc.sepolia.mantle.xyz
 ```
 
 ### Frontend

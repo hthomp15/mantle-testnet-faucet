@@ -19,7 +19,7 @@ export function useFaucet(account: string) {
 
   const checkClaimStatus = useCallback(async (userAddress: string): Promise<void> => {
     if (!userAddress) return;
-    
+    console.log('Checking claim status for:', userAddress);
     try {
       const status = await api.checkStatus(userAddress);
       setClaimStatus(status);
@@ -38,8 +38,11 @@ export function useFaucet(account: string) {
         TokenABI.abi,
         provider
       );
-      
-      const balance = await token.balanceOf(userAddress);
+
+      // Normalize the address to ensure it's valid
+      const normalizedAddress = ethers.getAddress(userAddress); // This will throw if the address is invalid
+
+      const balance = await token.balanceOf(normalizedAddress);
       setTokenBalance(ethers.formatUnits(balance, 18));
     } catch (err) {
       console.error('Error updating balance:', err);

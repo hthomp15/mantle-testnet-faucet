@@ -1,3 +1,4 @@
+const hre = require("hardhat");
 const fs = require('fs');
 const path = require('path');
 
@@ -8,21 +9,21 @@ async function main() {
         fs.mkdirSync(contractsDir, { recursive: true });
     }
 
-    // Export Faucet ABI
-    const Faucet = artifacts.readArtifactSync("Faucet");
+    // Export Faucet ABI and address
+    const Faucet = await hre.artifacts.readArtifact("Faucet");
     fs.writeFileSync(
         path.join(contractsDir, 'Faucet.json'),
-        JSON.stringify({ abi: Faucet.abi }, null, 2)
+        JSON.stringify(Faucet, null, 2)
     );
 
-    // Export TestToken ABI
-    const TestToken = artifacts.readArtifactSync("TestToken");
+    // Export TestToken ABI and address
+    const TestToken = await hre.artifacts.readArtifact("TestToken");
     fs.writeFileSync(
         path.join(contractsDir, 'TestToken.json'),
-        JSON.stringify({ abi: TestToken.abi }, null, 2)
+        JSON.stringify(TestToken, null, 2)
     );
 
-    console.log("📝 ABIs exported to frontend/contracts/");
+    console.log("📝 Contract artifacts exported to frontend/contracts/");
 }
 
 main()
