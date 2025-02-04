@@ -61,7 +61,9 @@ const startServer = async () => {
 
   // Middleware
   app.use(cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3000'
+    origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+    methods: ['GET', 'POST'],
+    credentials: true
   }));
   app.use(express.json());
 
