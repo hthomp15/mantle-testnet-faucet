@@ -22,7 +22,7 @@ RPC_URL=https://rpc.sepolia.mantle.xyz
 FAUCET_ADDRESS=0x...  # Faucet contract address
 
 # CORS Configuration (for development)
-FRONTEND_URL=http://localhost:3000
+DEVELOPMENT_URL=http://localhost:3000
 ```
 
 ## Getting Started
@@ -87,24 +87,64 @@ Errors are logged with the following levels:
 
 ## Development
 
-1. Run with nodemon for auto-reloading:
+1. Set up local database:
+```bash
+# Create PostgreSQL database
+createdb your_local_db
+```
+
+2. Configure environment variables in `.env`:
+```bash
+# Database Configuration (Development)
+POSTGRES_USER=your_local_user
+POSTGRES_HOST=localhost
+POSTGRES_DB=your_local_db
+POSTGRES_PASSWORD=your_local_password
+POSTGRES_PORT=5432
+
+# Server Configuration
+PORT=5001
+
+# Network Configuration
+RPC_URL=https://rpc.sepolia.mantle.xyz
+FAUCET_ADDRESS=0x...  # Your deployed faucet contract address
+
+# CORS Configuration
+DEVELOPMENT_URL=http://localhost:3000          # Development frontend URL
+PRODUCTION_URL=https://your-app.vercel.app  # Production frontend URL
+```
+
+3. Run migrations:
+```bash
+npm run migrate:dev
+```
+
+4. Start development server:
 ```bash
 npm run dev
 ```
 
-2. Check logs:
-```bash
-tail -f logs/combined.log
-```
-
 ## Production Deployment
 
-1. Set production environment variables
-2. Build and start:
+The backend is configured for Railway deployment:
+
+1. Environment variables are automatically set:
+   - `DATABASE_URL`: Provided by Railway
+   - `NODE_ENV=production`: Set by Railway
+   - `PRODUCTION_URL`: Your frontend's production URL
+
+2. Deployment process:
 ```bash
-npm run build
-npm start
+# Railway automatically runs:
+npm run build        # Installs dependencies
+npm run postbuild    # Runs production migrations
+npm run start        # Starts the server
 ```
+
+3. Verify deployment:
+   - Check Railway logs
+   - Test API endpoints
+   - Monitor database connections
 
 ## Dependencies
 

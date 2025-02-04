@@ -6,9 +6,10 @@ const db = require('../db');
 router.post('/users', async (req, res) => {
   try {
     const { walletAddress } = req.body;
+    const normalizedWalletAddress = walletAddress.toLowerCase(); // Normalize to lowercase
     const result = await db.query(
       'INSERT INTO users (wallet_address) VALUES ($1) RETURNING *',
-      [walletAddress]
+      [normalizedWalletAddress]
     );
     res.json(result.rows[0]);
   } catch (error) {
@@ -23,34 +24,14 @@ router.post('/claims', async (req, res) => {
     const { walletAddress, amount } = req.body;
     const CLAIM_WINDOW = 24; // hours
     const MAX_AMOUNT = 1000; // maximum tokens allowed in 24 hours
-    
-    // Check total claims in the last 24 hours
-    const claimsResult = await db.query(
-      `SELECT COALESCE(SUM(amount), 0) as total_claimed
-       FROM claims c 
-       JOIN users u ON c.user_id = u.id 
-       WHERE u.wallet_address = $1 
-       AND c.claimed_at > NOW() - INTERVAL '${CLAIM_WINDOW} HOURS'`,
-      [walletAddress]
-    );
-
-    const totalClaimed = Number(claimsResult.rows[0].total_claimed);
-    const requestAmount = Number(amount);
-    
-    if (totalClaimed + requestAmount > MAX_AMOUNT) {
-      return res.status(400).json({ 
-        error: 'Claim limit exceeded',
-        totalClaimed,
-        remainingAmount: Math.max(0, MAX_AMOUNT - totalClaimed)
-      });
-    }
 
     // Get or create user
     let userResult = await db.query(
       'SELECT id FROM users WHERE wallet_address = $1',
       [walletAddress]
     );
-    
+
+    // If user does not exist, create them
     if (userResult.rows.length === 0) {
       userResult = await db.query(
         'INSERT INTO users (wallet_address) VALUES ($1) RETURNING id',
@@ -59,7 +40,28 @@ router.post('/claims', async (req, res) => {
     }
 
     const userId = userResult.rows[0].id;
-    
+
+    // Check total claims in the last 24 hours for the user
+    const claimsResult = await db.query(
+      `SELECT COALESCE(SUM(amount), 0) as total_claimed
+       FROM claims c 
+       WHERE c.user_id = $1 
+       AND c.claimed_at > NOW() - INTERVAL '${CLAIM_WINDOW} HOURS'`,
+      [userId]
+    );
+
+    const totalClaimed = Number(claimsResult.rows[0].total_claimed);
+    const requestAmount = Number(amount);
+
+    if (totalClaimed + requestAmount > MAX_AMOUNT) {
+      return res.status(400).json({ 
+        error: 'Claim limit exceeded',
+        totalClaimed,
+        remainingAmount: Math.max(0, MAX_AMOUNT - totalClaimed)
+      });
+    }
+
+    // Finally create the claim
     const claimResult = await db.query(
       'INSERT INTO claims (user_id, amount) VALUES ($1, $2) RETURNING *',
       [userId, requestAmount]
@@ -81,6 +83,7 @@ router.post('/claims', async (req, res) => {
 router.get('/claims/:walletAddress', async (req, res) => {
   try {
     const { walletAddress } = req.params;
+    const normalizedWalletAddress = walletAddress.toLowerCase(); // Normalize to lowercase
     const CLAIM_WINDOW = 24; // hours
     const MAX_AMOUNT = 1000; // maximum tokens allowed in 24 hours
     
@@ -93,7 +96,7 @@ router.get('/claims/:walletAddress', async (req, res) => {
        JOIN users u ON c.user_id = u.id 
        WHERE u.wallet_address = $1 
        AND c.claimed_at > NOW() - INTERVAL '${CLAIM_WINDOW} HOURS'`,
-      [walletAddress]
+      [normalizedWalletAddress]
     );
     
     const claimStats = result.rows[0] || { total_claimed: 0, first_claim: null, last_claim: null };

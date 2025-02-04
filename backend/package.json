@@ -4,11 +4,12 @@
   "description": "Backend for ETH faucet application",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js",
-    "migrate": "node migrations/run-migrations.js",
+    "start": "NODE_ENV=production node server.js",
+    "dev": "NODE_ENV=development nodemon server.js",
+    "migrate:dev": "NODE_ENV=development node migrations/run-migrations.js",
+    "migrate:prod": "NODE_ENV=production node migrations/run-migrations.js",
     "build": "npm install",
-    "postbuild": "npm run migrate"
+    "postbuild": "npm run migrate:prod"
   },
   "dependencies": {
     "cors": "^2.8.5",

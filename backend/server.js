@@ -9,10 +9,9 @@ const port = process.env.PORT || 5001;
 // Middleware
 app.use(express.json());
 app.use(cors({
-  origin: [
-    'https://mantle-testnet-faucet.vercel.app',
-    'http://localhost:3000'
-  ]
+  origin: process.env.NODE_ENV === 'production' 
+    ? process.env.PRODUCTION_URL  // e.g., 'https://mantle-testnet-faucet.vercel.app'
+    : process.env.DEVELOPMENT_URL    // e.g., 'http://localhost:3000'
 }));
 
 // Routes
