@@ -8,10 +8,17 @@ const port = process.env.PORT || 5001;
 
 // Middleware
 app.use(express.json());
+
+const DEVELOPMENT_URL = process.env.DEVELOPMENT_URL;
+const PRODUCTION_URL = process.env.PRODUCTION_URL;
+
+// Determine the allowed origin based on the environment
+const allowedOrigins = process.env.NODE_ENV === 'production' ? [PRODUCTION_URL] : [DEVELOPMENT_URL];
+
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? process.env.PRODUCTION_URL  // e.g., 'https://mantle-testnet-faucet.vercel.app'
-    : process.env.DEVELOPMENT_URL    // e.g., 'http://localhost:3000'
+  origin: allowedOrigins,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Specify allowed methods
+  credentials: true // Allow credentials if needed
 }));
 
 // Routes
