@@ -69,7 +69,6 @@ export function useWallet() {
   }, [provider, checkConnection, mounted]);
 
   const handleAccountsChanged = useCallback((accounts: string[]) => {
-    console.log('Accounts changed:', accounts);
     if (accounts.length === 0) {
       setAccount("");
       setIsWrongChain(false);
@@ -153,7 +152,7 @@ export function useWallet() {
       const signer = await currentProvider.getSigner();
       const address = await signer.getAddress();
       const normalizedAddress = address.toLowerCase();
-      console.log('Connected wallet address:', address);
+
       // Register user in our backend
       await api.registerUser(normalizedAddress);
       

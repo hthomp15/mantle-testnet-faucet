@@ -19,7 +19,6 @@ export function useFaucet(account: string) {
 
   const checkClaimStatus = useCallback(async (userAddress: string): Promise<void> => {
     if (!userAddress) return;
-    console.log('Checking claim status for:', userAddress);
     try {
       const status = await api.checkStatus(userAddress);
       setClaimStatus(status);

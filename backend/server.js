@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const usersRouter = require('./routes/users');
+const { EventLogger } = require('./services/eventLogger');
 require('dotenv').config();
 
 const app = express();
@@ -11,12 +12,20 @@ app.use(express.json());
 
 app.use(cors({
   origin: [
-    'https://mantle-testnet-faucet.vercel.app',
-    'http://localhost:3000'
+    `${process.env.PRODUCTION_URL}`,
+    `${process.env.DEVELOPMENT_URL}`
   ],
-  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Specify allowed methods
-  credentials: true // Allow credentials if needed
+  methods: ['GET', 'POST'],
+  credentials: true 
 }));
+
+// Event logger
+const eventLogger = new EventLogger(process.env.RPC_URL, process.env.FAUCET_ADDRESS);
+eventLogger.startListening().then(() => {
+  console.log('Event logger started');
+}).catch((error) => {
+  console.error('Error starting event logger:', error);
+});
 
 // Routes
 app.use('/api', usersRouter);

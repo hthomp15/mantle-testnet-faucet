@@ -6,7 +6,7 @@ const db = require('../db');
 router.post('/users', async (req, res) => {
   try {
     const { walletAddress } = req.body;
-    const normalizedWalletAddress = walletAddress.toLowerCase(); // Normalize to lowercase
+    const normalizedWalletAddress = walletAddress.toLowerCase();
     const result = await db.query(
       'INSERT INTO users (wallet_address) VALUES ($1) RETURNING *',
       [normalizedWalletAddress]
@@ -22,20 +22,22 @@ router.post('/users', async (req, res) => {
 router.post('/claims', async (req, res) => {
   try {
     const { walletAddress, amount } = req.body;
+    const normalizedWalletAddress = walletAddress.toLowerCase();
     const CLAIM_WINDOW = 24; // hours
     const MAX_AMOUNT = 1000; // maximum tokens allowed in 24 hours
+
 
     // Get or create user
     let userResult = await db.query(
       'SELECT id FROM users WHERE wallet_address = $1',
-      [walletAddress]
+      [normalizedWalletAddress]
     );
 
     // If user does not exist, create them
     if (userResult.rows.length === 0) {
       userResult = await db.query(
         'INSERT INTO users (wallet_address) VALUES ($1) RETURNING id',
-        [walletAddress]
+        [normalizedWalletAddress]
       );
     }
 
@@ -83,7 +85,7 @@ router.post('/claims', async (req, res) => {
 router.get('/claims/:walletAddress', async (req, res) => {
   try {
     const { walletAddress } = req.params;
-    const normalizedWalletAddress = walletAddress.toLowerCase(); // Normalize to lowercase
+    const normalizedWalletAddress = walletAddress.toLowerCase();
     const CLAIM_WINDOW = 24; // hours
     const MAX_AMOUNT = 1000; // maximum tokens allowed in 24 hours
     

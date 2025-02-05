@@ -46,7 +46,6 @@ export const api = {
   },
 
   claim: async (walletAddress: string, amount: number) => {
-    console.log('Claiming with data:', { walletAddress, amount });
     
     const res = await fetch(`${API_URL}/api/claims`, {
       method: 'POST',

@@ -5,7 +5,6 @@ Express.js server that monitors faucet contract events and provides API endpoint
 ## Features
 
 - Event monitoring for faucet contract
-- Winston logging system
 - Rate limiting for API endpoints
 - User claim tracking
 
@@ -23,23 +22,9 @@ FAUCET_ADDRESS=0x...  # Faucet contract address
 
 # CORS Configuration (for development)
 DEVELOPMENT_URL=http://localhost:3000
-```
 
-## Getting Started
-
-1. Install dependencies:
-```bash
-npm install
-```
-
-2. Start development server:
-```bash
-npm run dev
-```
-
-3. Start production server:
-```bash
-npm start
+# Cors Configuration (Production)
+PRODUCTION_URL=https://your-app.vercel.app
 ```
 
 ## API Endpoints
@@ -103,14 +88,14 @@ POSTGRES_PASSWORD=your_local_password
 POSTGRES_PORT=5432
 
 # Server Configuration
-PORT=5001
+PORT=5001 # This is the port that the server will run on
 
 # Network Configuration
 RPC_URL=https://rpc.sepolia.mantle.xyz
 FAUCET_ADDRESS=0x...  # Your deployed faucet contract address
 
 # CORS Configuration
-DEVELOPMENT_URL=http://localhost:3000          # Development frontend URL
+DEVELOPMENT_URL=http://localhost:3000 # Development frontend URL
 PRODUCTION_URL=https://your-app.vercel.app  # Production frontend URL
 ```
 
@@ -150,7 +135,6 @@ npm run start        # Starts the server
 
 - express: Web server framework
 - ethers: Ethereum library
-- winston: Logging
 - cors: Cross-origin resource sharing
 - dotenv: Environment variable management
 
