@@ -55,9 +55,12 @@ GET /api/claims/:address
 ## Event Monitoring
 
 The backend monitors the following contract events:
-- TokensRequested
-- TokensClaimed
-- LowBalance
+- TokensClaimed (for tracking user claims)
+- LowBalance (alerting when the balance is low)
+- FaucetPaused (alerting when the faucet is paused)
+- FaucetUnpaused (alerting when the faucet is unpaused)
+- TokensReceived (for funding the faucet)
+  
 
 Events are logged to:
 - `/logs/combined.log` - All logs

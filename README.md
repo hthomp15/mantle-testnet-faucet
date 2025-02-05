@@ -98,12 +98,6 @@ ACCOUNT_PRIVATE_KEY=your_private_key
 MANTLE_TESTNET_RPC_URL=https://rpc.sepolia.mantle.xyz
 ```
 
-### Frontend
-See [frontend/README.md](frontend/README.md)
-
-### Backend
-See [backend/README.md](backend/README.md)
-
 ## License
 
 MIT

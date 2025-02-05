@@ -1,7 +1,6 @@
 const { ethers } = require('ethers');
 
 const FAUCET_ABI = [
-  "event TokensRequested(address indexed recipient, uint256 amount)",
   "event TokensClaimed(address indexed user, uint256 amount, uint256 timestamp, uint256 windowTotal)",
   "event LowBalance(uint256 currentBalance, uint256 threshold, uint256 timestamp)",
   "event FaucetPaused(address indexed by)",
@@ -40,13 +39,7 @@ class EventLogger {
             const events = await this.contract.queryFilter('*', this.lastBlockNumber + 1, currentBlock);
             
             for (const event of events) {
-              if (event.fragment.name === 'TokensRequested') {
-                console.log('Tokens Requested', {
-                  recipient: event.args[0],
-                  amount: event.args[1].toString(),
-                  transactionHash: event.transactionHash
-                });
-              } else if (event.fragment.name === 'TokensClaimed') {
+              if (event.fragment.name === 'TokensClaimed') {
                 console.log('Tokens Claimed', {
                   user: event.args[0],
                   amount: event.args[1].toString(),
